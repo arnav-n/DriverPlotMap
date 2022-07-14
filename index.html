@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Driver Plot</title>
+    </head>
+
+
+    <body>
+        <h1>Driver Database</h1>
+        <table id="driverTable"></table>
+        <br></br>
+
+        <!-- <input type="button" onclick = "showElem('driverModal')" value="Add Driver"> -->
+        <button id = addDriver onclick="showElem('driverModal')">Add Driver</button>
+        <div id = driverModal class="modal">
+            <div id = modalContent class = modal-content>
+                <h3>Add Driver</h3>
+      
+                <!-- new driver form -->
+                <form>
+                    <input type="text" id="fname" name="fName" placeholder="First Name" required><br>
+                    <br><input type="text" id="lname" name="lName" placeholder="Last Name" required><br>
+                    <br><input type="text" id="phnum" name="phNum" placeholder="Phone Number" required><br>
+                    <br><input type="text" id="zipc" name="zipCode" placeholder="Zip Code" required><br>
+      
+                    <!-- TO DO: figure out submit vs onclick -->
+                    <br><button type="button" onclick=newDriver()>Submit</button><br>
+                    <br><button type="button" onclick="hideElem('driverModal')">Close</button>
+                </form>
+            </div>
+        </div>
+        
+
+        <button id = addAddress onclick="showElem('addressModal')">Add Address</button>
+        <div id = addressModal class="modal">
+            <div id = modalContent class = modal-content>
+                <h3>Add Address</h3>
+                <!-- new address form -->
+                <form>
+                    <input type="text" id="addressone" placeholder="Address1"><br>
+                    <br><input type="text" id="addresstwo" placeholder="Address2"><br>
+                    <br><input type="text" id="city" placeholder="City"><br>
+                    <br><input type="text" id="state" placeholder="State"><br>
+                    <br><input type="text" id="country" placeholder="Country"><br>
+                    <br><input type="text" id="zipcode" placeholder="Zip Code"><br>
+
+                    <br><button type="button" onclick=newAddress()>Submit</button><br>
+                    <br><button type="button" onclick="hideElem('addressModal')">Close</button>
+                </form>
+            </div>
+        </div>
+
+    </body>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="script.js"></script>
+</html>
