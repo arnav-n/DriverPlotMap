@@ -25,6 +25,7 @@ function popTable(table, driverArr, locArr){
     var select = document.createElement("td");
 
     let string = "<select name=\"locSelect\">"
+    string += "<option value=" + "\"" + -1 + "\">--Please select a location--</option>"
     for (var i = 0;i<locArr.length;i++){
         let str = locArr[i].addressOne + locArr[i].addressTwo + ", " + locArr[i].city + ", " + locArr[i].country
         string+="<option value=" + "\"" + locArr[i].id + "\">" + str + "</option>"
@@ -145,13 +146,14 @@ async function newAddress(){
 }
 
 async function updateDriverAddress(e, type, driverToString){
-// test msg
-    console.log(driverToString + " " + type + " address changed to " + e.target.value)
-    // What I have now: on change, console logs JSON.stringify(driver) along with addressID
-    // TO DO: using driverToString, parse to JSON, then do a put request with Driver and EditedAddress
-    
-// real code
     driverObj = JSON.parse(driverToString)
+    console.log(driverObj.firstName + " " + type + " address changed to " + e.target.value)
+
+    if(e.target.value==-1){
+        alert("Please choose a valid location.")
+        return;
+    }
+
     var editedAddress = {};
     if(type === 'start'){
         editedAddress.startAddressId = e.target.value;
@@ -161,19 +163,27 @@ async function updateDriverAddress(e, type, driverToString){
         editedAddress.endAddressId = e.target.value;
     }
     // PUT (driver, editedaddress)
-    await fetch("https://dev-deliveryapis.cookapp.net/rider-simulator-service/rest/riders/5596EE6A-7637-446B-8DA2-453572D0342F",
-        {
+    await fetch("https://dev-deliveryapis.cookapp.net/rider-simulator-service/rest/riders/" + driverObj.id ,{
         headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+              'Content-Type': 'application/json'
         },
-        method: "POST",
-        body: JSON.stringify({
-            startAddressId:editedAddress.startAddressId , endAddressId:editedAddress.endAddressId
-        })
-    })
-    .then(function(res){ console.log(res) })
-    .catch(function(res){ console.log(res) })
+        method: 'PUT',
+        body: JSON.stringify(editedAddress)
+      })
+      .then(response => {
+          if(!response.ok)
+          {
+              throw new Error("ERROR");        
+          }
+      })
+      .then( data => {
+          alert("Address update success! ");
+        //   fetchDrivers();
+      })
+      .catch(error => {
+          alert(" Error while updating address " + error);
+        //   fetchDrivers();
+      })
 }
 
 // grab location and driver arrays from API, select table in HTML, call popTable()
@@ -184,6 +194,12 @@ async function buildTable(){
     popTable(table, drivers, addresses);
 }
 
+function initMap(){
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: -34.397, lng: 150.644 },
+        zoom: 8,
+      });
+}
 
 function main(){
     buildTable();
