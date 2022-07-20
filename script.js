@@ -27,7 +27,7 @@ function popTable(table, driverArr, locArr){
     let string = "<select name=\"locSelect\">"
     string += "<option value=" + "\"" + -1 + "\">--Please select a location--</option>"
     for (var i = 0;i<locArr.length;i++){
-        let str = locArr[i].addressOne + locArr[i].addressTwo + ", " + locArr[i].city + ", " + locArr[i].country
+        let str = locArr[i].addressOne + locArr[i].addressTwo + ", " + locArr[i].city
         string+="<option value=" + "\"" + locArr[i].id + "\">" + str + "</option>"
     }
     string+= "</select>"

@@ -2,12 +2,13 @@ table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
     width: 50%;
+    /* margin: auto */
   }
   
   td, th {
     border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;
+    padding: 6px;
   }
   
   tr:nth-child(even) {
@@ -39,9 +40,47 @@ table {
   }
 
   #map {
-    height: 500px;
+    height: 700px;
     /* The height is 400 pixels */
-    width: 80%;
+    width: 90%;
     /* The width is the width of the web page */
   }
   
+  .split {
+    height: 100%;
+    width: 50%;
+    position: fixed;
+    z-index: 1;
+    top: 1;
+    overflow-x: hidden;
+    padding-top: 20px;
+  }
+  
+  /* Control the left side */
+  .left {
+    left: 0;
+    margin: 15px
+    /* background-color:lightgoldenrodyellow; */
+  }
+  
+  /* Control the right side */
+  .right {
+    right: 0;
+    /* background-color: red; */
+  }
+  
+  /* If you want the content centered horizontally and vertically */
+  .centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .centervert {
+    position: relative;
+    top: 5%;
+    left: 5%;
+    text-align: center;
+  }
