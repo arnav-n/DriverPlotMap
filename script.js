@@ -13,7 +13,7 @@ function popTable(table, driverArr, locArr){
     // create headers and populate first 4 cells
     let thead = table.createTHead();
     let headrow = thead.insertRow();
-    let headerArr = ["Driver Name", "Start Location", "End Location", "Start Button Placeholder"]
+    let headerArr = ["Driver Name", "Start Location", "End Location", "Start Journey"]
     for (var i = 0;i<headerArr.length;i++){
         let cell = document.createElement("th");
         let text = document.createTextNode(headerArr[i]);
@@ -21,23 +21,12 @@ function popTable(table, driverArr, locArr){
         headrow.appendChild(cell);
     }
 
-    // creating select element once
-    var select = document.createElement("td");
-
-    let string = "<select name=\"locSelect\">"
-    string += "<option value=" + "\"" + -1 + "\">--Please select a location--</option>"
-    for (var i = 0;i<locArr.length;i++){
-        let str = locArr[i].addressOne + locArr[i].addressTwo + ", " + locArr[i].city
-        string+="<option value=" + "\"" + locArr[i].id + "\">" + str + "</option>"
-    }
-    string+= "</select>"
-    select.innerHTML = string;
-
     // populate table
     for (var i = 0;i<driverArr.length;i++){
         let row = table.insertRow();   
+        var destinations = [driverArr[i].startAddressId, driverArr[i].endAddressId]
 
-        // add first column: driver name
+// add first column: driver name
         let driver = document.createElement("td");
 
         let curDriverName = ""
@@ -45,30 +34,73 @@ function popTable(table, driverArr, locArr){
         else curDriverName = (driverArr[i].firstName);
         let dName = document.createTextNode(curDriverName);
         driver.appendChild(dName);
+
+        // show driver on map when clicked on
+        driver.addEventListener('click', 
+        (function(arr, id) {
+            return function(){
+                setMarker(arr, id, "Driver Location", true);
+            };
+        }) 
+        (locArr, destinations[0]));
+
         row.appendChild(driver);
-        
-        // second and third columns: clone location selector, add event listeners
+
+// second and third columns: clone location selector, add event listeners
         // listeners use closure to preserve the driverArr[i] variable, instead of changing it to the most current
         // function can be externalized: relevant link here:
             // https://stackoverflow.com/questions/10000083/javascript-event-handler-with-parameters
-
-        // To Do: change curDriverName to the toString of the entire Driver JSON object
         driverToString = JSON.stringify(driverArr[i])
-        let startSel = select.cloneNode(true);
+        var startSel = document.createElement("td");
+        let startString = "<select name=\"locSelect\">"
+        for (var j = 0;j<locArr.length;j++){
+            let str = locArr[j].addressOne + locArr[j].addressTwo + ", " + locArr[j].city
+            if(locArr[j].id == destinations[0]){
+                startString+="<option value=" + "\"" + locArr[j].id + "\"selected >" + str + "</option>"
+            }
+            else{
+                startString+="<option value=" + "\"" + locArr[j].id + "\">" + str + "</option>"
+            }
+        }
+        startString+= "</select>"
+        startSel.innerHTML = startString;
+
         startSel.addEventListener('change', (function(type, obj) {
             return function(e) {updateDriverAddress(e, type, obj); };
         }) ("start", driverToString), false);
         row.appendChild(startSel)
 
-        let endSel = select.cloneNode(true);
+        var endSel = document.createElement("td");
+        let endString = "<select name=\"locSelect\">"
+        for (var j = 0;j<locArr.length;j++){
+            let str = locArr[j].addressOne + locArr[j].addressTwo + ", " + locArr[j].city
+            if(locArr[j].id == destinations[1]){
+                endString+="<option value=" + "\"" + locArr[j].id + "\"selected >" + str + "</option>"
+            }
+            else{
+                endString+="<option value=" + "\"" + locArr[j].id + "\">" + str + "</option>"
+            }
+        }
+        endString+= "</select>"
+        endSel.innerHTML = endString;
+
         endSel.addEventListener('change', (function(type, obj) {
             return function(e) {updateDriverAddress(e, type, obj); };
         }) ("end", driverToString), false);
         row.appendChild(endSel)
 
-        // start button fourth column
+// start button fourth column
         let placehldr = document.createElement("td");
-        placehldr.appendChild(document.createTextNode("placeholder"));
+        let btn = document.createElement("button");
+        btn.innerHTML = "Start"
+
+        btn.addEventListener('click', 
+        (function(arr, start, end) {
+            return function() {
+                startDrive(arr, start, end)
+            }
+        }) (locArr, destinations[0], destinations[1]), false);
+        placehldr.appendChild(btn);
         row.appendChild(placehldr);
     }
 }
@@ -140,6 +172,7 @@ async function newAddress(){
     .then(function(res){ console.log(res) })
     .catch(function(res){ console.log(res) })
 
+    // refresh table
     table = document.querySelector("table");
     table.innerHTML = ""
     buildTable();   
@@ -184,6 +217,11 @@ async function updateDriverAddress(e, type, driverToString){
           alert(" Error while updating address " + error);
         //   fetchDrivers();
       })
+
+    // refresh table
+    table = document.querySelector("table");
+    table.innerHTML = ""
+    buildTable();   
 }
 
 // grab location and driver arrays from API, select table in HTML, call popTable()
@@ -195,10 +233,38 @@ async function buildTable(){
 }
 
 function initMap(){
-    map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: -34.397, lng: 150.644 },
-        zoom: 8,
+    window.map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 40, lng: -100},
+        zoom: 4,
       });
+}
+
+function test(){
+    alert("working")
+}
+
+function setMarker(locArr, addressID, name, highlight = false){
+    for (var i = 0;i<locArr.length;i++){
+        if(locArr[i].id == addressID){
+            var latLong = { lat: locArr[i].lat, lng: locArr[i].lon};
+        }
+    }
+    
+    var marker = new google.maps.Marker({
+        position: latLong,
+        title: name
+    });
+    marker.setMap(window.map);
+
+    if(highlight){
+        window.map.panTo(latLong);
+        window.map.setZoom(6);
+    }
+    return latLong;
+}
+function startDrive(locArr, start, end){
+    setMarker(locArr, start, "Start", true);
+    setMarker(locArr, end, "End");
 }
 
 function main(){
