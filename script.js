@@ -35,7 +35,7 @@ function popTable(table, driverArr, locArr){
         let dName = document.createTextNode(curDriverName);
         driver.appendChild(dName);
 
-        // show driver on map when clicked on
+        // clickable driver name
         driver.addEventListener('click', 
         (function(arr, id) {
             return function(){
